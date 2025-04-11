@@ -125,8 +125,6 @@ public:
         istringstream iss(linha);
         string token;
 
-        cout << "Processando linha: [" << linha << "] na secao: [" << secao << "]" << endl;
-
         if (secao == "Nodes") {
             // Formato: N1, N2, etc. ou apenas números
             string node_id;
@@ -287,8 +285,6 @@ void processarInstancia(const string& nomeArquivo, Grafo& grafo) {
             continue;
         }
         
-        // Processar linhas de dados
-        cout << "Processando linha: [" << linha << "] na secao: [" << secao << "]" << endl;
         grafo.processarLinha(linha, secao);
     }
     
