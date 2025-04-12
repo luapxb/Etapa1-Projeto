@@ -119,6 +119,110 @@ public:
         }
         return max_grau;
     }
+// Calcula os menores caminhos de um vértice usando Dijkstra
+map<int, int> dijkstra(int origem, const map<int, vector<pair<int, int>>>& adj) {
+    map<int, int> dist;
+    for (const auto& par : adj) dist[par.first] = INT_MAX;
+    dist[origem] = 0;
+
+    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<>> fila;
+    fila.push({0, origem});
+
+    while (!fila.empty()) {
+        int d = fila.top().first;
+        int u = fila.top().second;
+        fila.pop();
+
+        if (d > dist[u]) continue;
+
+        for (auto& viz : adj.at(u)) {
+            int v = viz.first, custo = viz.second;
+            if (dist[u] + custo < dist[v]) {
+                dist[v] = dist[u] + custo;
+                fila.push({dist[v], v});
+            }
+        }
+    }
+
+    return dist;
+}
+
+map<int, vector<pair<int, int>>> construirAdjacenciaComPeso() {
+    map<int, vector<pair<int, int>>> adj;
+    for (int v : vertices) adj[v] = vector<pair<int, int>>();
+    
+    for (const Aresta& e : arestas) {
+        adj[e.from].push_back({e.to, e.traversal_cost});
+        adj[e.to].push_back({e.from, e.traversal_cost});
+    }
+
+    for (const Arco& a : arcos) {
+        adj[a.from].push_back({a.to, a.traversal_cost});
+    }
+
+    return adj;
+}
+
+// 11. Intermediação (Betweenness Centrality simplificada)
+map<int, double> intermediacao() {
+    auto adj = construirAdjacenciaComPeso();
+    map<int, double> centralidade;
+
+    for (int s : vertices) {
+        for (int t : vertices) {
+            if (s == t) continue;
+            auto dist = dijkstra(s, adj);
+
+            for (int v : vertices) {
+                if (v == s || v == t) continue;
+                // Se o caminho mínimo s->t passa por v, incrementa
+                auto dist_s = dijkstra(s, adj);
+                auto dist_t = dijkstra(t, adj);
+                if (dist_s[t] == dist_s[v] + dist_t[v])
+                    centralidade[v]++;
+            }
+        }
+    }
+    return centralidade;
+}
+
+// 12. Caminho médio (Average Shortest Path Length)
+double caminhoMedio() {
+    auto adj = construirAdjacenciaComPeso();
+    double soma = 0.0;
+    int pares = 0;
+
+    for (int u : vertices) {
+        auto dist = dijkstra(u, adj);
+        for (int v : vertices) {
+            if (u != v && dist[v] != INT_MAX) {
+        
+                soma += dist[v];
+                pares++;
+            }
+        }
+    }
+
+    return pares ? soma / pares : 0.0;
+}
+
+// 13. Diâmetro (maior caminho mínimo entre todos os pares)
+int diametro() {
+    auto adj = construirAdjacenciaComPeso();
+    int max_dist = 0;
+
+    for (int u : vertices) {
+        auto dist = dijkstra(u, adj);
+        for (int v : vertices) {
+            if (u != v && dist[v] != INT_MAX) {
+                max_dist = max(max_dist, dist[v]);
+            }
+        }
+    }
+
+    return max_dist;
+}
+
 
     void processarLinha(const string& linha, const string& secao) {
         if (linha.empty()) return;
@@ -320,6 +424,14 @@ int main() {
     cout << "8. Componentes conectados: " << grafo.componentesConectados() << endl;
     cout << "9. Grau minimo dos vertices: " << grafo.grauMinimo() << endl;
     cout << "10. Grau maximo dos vertices: " << grafo.grauMaximo() << endl;
+    cout << "11. Intermediação dos vértices:\n";
+    for (const auto& par : grafo.intermediacao()) {
+        cout << "   Vertice " << par.first << ": " << par.second << endl;
+    }
+
+    cout << "12. Caminho médio: " << grafo.caminhoMedio() << endl;
+    cout << "13. Diâmetro do grafo: " << grafo.diametro() << endl;
+
 
     return 0;
 }
