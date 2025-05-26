@@ -12,12 +12,16 @@ cd ETAPA1-PROJETO
 2. Compile o código fonte:
 ```bash
 g++ -o etapa1_cod etapa1cod.cpp 
+obs.: para a fase 2: 
+g++ -std=c++17 -o etapa2 etapa2.cpp
 ```
 
 ## Instruções de Execução
 Forma básica:
 ```bash
 ./etapa1_cod instancias/nome_da_instancia.dat
+obs.: para a fase 2:
+./etapa2
 ```
 
 Exemplos:
