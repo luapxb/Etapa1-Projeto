@@ -60,3 +60,7 @@ O programa gera um relatório com 13 métricas do grafo:
     12. Caminho médio
 
     13. Diâmetro do grafo
+
+## Colaboradores
+- Ketlyn Sara - @kethlynsara
+- Luana Peixoto - @luapxb
