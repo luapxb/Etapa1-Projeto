@@ -318,8 +318,8 @@ int diametro() {
     }
 };
 
-void processarInstancia(const string& nomeArquivo, Grafo& grafo) {
-    string caminhoArquivo = "../instancias/" + nomeArquivo;
+void processarInstancia(const string& caminhoArquivo, Grafo& grafo) {
+    // string caminhoArquivo = "../instancias/" + nomeArquivo;
     cout << "Abrindo arquivo: " << caminhoArquivo << endl;
     ifstream arquivo(caminhoArquivo);
     if (!arquivo) {
@@ -395,23 +395,38 @@ void processarInstancia(const string& nomeArquivo, Grafo& grafo) {
     arquivo.close();
 }
 
-int main() {
+void mostrarAjuda() {
+    cout << "Uso: ./etapa1_cod <caminho_instancia> [opções]\n";
+    cout << "Opções:\n";
+    cout << "  -h, --help     Mostrar esta mensagem de ajuda\n";
+    cout << "\nExemplo:\n";
+    cout << "  ./etapa1_cod instancias/BHW1.dat\n";
+}
+
+int main(int argc, char* argv[]) {
+     if (argc < 2) {
+        cerr << "Erro: Nenhum arquivo especificado.\n";
+        mostrarAjuda();
+        return 1;
+    }
+
+    string caminhoArquivo = argv[1];
+    
+    // Verificar se o usuário pediu ajuda
+    if (caminhoArquivo == "-h" || caminhoArquivo == "--help") {
+        mostrarAjuda();
+        return 0;
+    }
+
+    if (caminhoArquivo.find("instancias/") == string::npos) {
+        caminhoArquivo = "instancias/" + caminhoArquivo;
+    }
+
     Grafo grafo;
-    string nomeArquivo;
-    // Lista automaticamente os arquivos .dat
-    // listarArquivosDat();
+ 
+    cout << "\n=== Processando: " << caminhoArquivo << " ===\n";
 
-    cout << "\nDigite o nome da instancia: ";
-    getline(cin, nomeArquivo);
-
-    // if (!arquivoExiste(nomeArquivo)) {
-    //  cerr << "\nERRO: Arquivo '" << nomeArquivo << "' nao encontrado!\n";
-    //  listarArquivosDat();
-    // return 1;
-    //}
-    cout << "\n=== Processando: " << nomeArquivo << " ===\n";
-
-    processarInstancia(nomeArquivo, grafo);
+    processarInstancia(caminhoArquivo, grafo);
 
     cout << "\n=== Metricas da Instancia ===\n";
     cout << "1. Quantidade de vertices: " << grafo.qtdVertices() << endl;
