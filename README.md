@@ -28,8 +28,8 @@ Exemplos:
 
 Opções disponíveis:
 ```bash
-./etapai_cod -h       # Mostra ajuda
-./etapai_cod --help   # Mostra ajuda
+./etapa1_cod -h       # Mostra ajuda
+./etapa1_cod --help   # Mostra ajuda
 ```
 
 ## Saída do Programa
