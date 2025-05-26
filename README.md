@@ -11,7 +11,7 @@ cd ETAPA1-PROJETO
 ```
 2. Compile o código fonte:
 ```bash
-g++ -o etapa1_cod etapa1cod.cpp -std=c++11 -O2
+g++ -o etapa1_cod etapa1cod.cpp 
 ```
 
 ## Instruções de Execução
