@@ -55,6 +55,9 @@ void processarInstancia(const string& caminhoArquivo) {
     string secao;
     bool headerProcessed = false;
 
+    // Garante que o deposito esta no grafo
+    grafo[deposito] = vector<Aresta>(); // Inicializa o depósito no grafo
+
     while (getline(arquivo, linha)) {
         // Limpar espaços
         linha.erase(0, linha.find_first_not_of(" \t"));
@@ -173,6 +176,12 @@ void processarInstancia(const string& caminhoArquivo) {
         }
     }
 
+    //cout << "Nós no grafo: " << grafo.size() << endl;
+    if (grafo.find(deposito) == grafo.end()) {
+        cerr << "AVISO: Depósito " << deposito << " não foi incluído no grafo!" << endl;
+        grafo[deposito] = vector<Aresta>(); // Força criação se ainda não existir
+    }
+
     // Garantir que todos os nós aparecem no grafo
     for (const auto& [node, _] : grafo) {
         if (grafo.find(node) == grafo.end()) {
@@ -184,8 +193,12 @@ void processarInstancia(const string& caminhoArquivo) {
 }
 
 
-// Função para calcular caminhos mínimos entre todos os nós com Dijkstra
+// Função para calcular caminhos mínimos entre todos os nós
 void dijkstra(int origem, vector<int> &dist) {
+    if (grafo.find(origem) == grafo.end()) {
+        cerr << "Erro: Nó " << origem << " não existe no grafo!" << endl;
+        return;
+    }
     int n = (int)grafo.size();
     dist.assign(n, 1e9);
     dist[origem] = 0;
@@ -258,7 +271,7 @@ vector<Rota> construirRotas() {
 }
 
 // Salvar a solução no arquivo de saida
-void salvarSolucao(const string &nomeArquivo, const vector<Rota> &rotas, int tempoReferencia, int tempoSolucao) {
+void exportarSolucao(const string &nomeArquivo, const vector<Rota> &rotas, int tempoReferencia, int tempoSolucao) {
     ofstream saida(nomeArquivo);
     if (!saida.is_open()) {
         cerr << "Erro ao abrir arquivo de saída: " << nomeArquivo << endl;
@@ -334,7 +347,7 @@ int main() {
         // Gerar nome do arquivo de saída
         string caminhoSaida = pastaSolucoes + "/sol-" + nomeArquivo;
 
-        salvarSolucao(caminhoSaida, rotas, duracaoReferencia, duracaoSolucao);
+        exportarSolucao(caminhoSaida, rotas, duracaoReferencia, duracaoSolucao);
 
         cout << "Instância " << nomeArquivo << " processada. Tempo: " << duracaoSolucao << " ms." << endl;
     }
