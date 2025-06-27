@@ -6,7 +6,7 @@
 using namespace std;
 
 // Exporta a solução para um arquivo no formato especificado
-void exportarSolucao(const string& nomeArquivo, const vector<Rota>& rotas, int tempoSolucao, const Grafo& g) {
+void exportarSolucao(const string& nomeArquivo, const vector<Rota>& rotas, int tempoReferencia, int tempoSolucao, const Grafo& g) {
     ofstream saida(nomeArquivo); // Abre o arquivo de saída
     if (!saida.is_open()) {
         cerr << "Erro ao abrir arquivo de saída: " << nomeArquivo << endl;
@@ -20,8 +20,8 @@ void exportarSolucao(const string& nomeArquivo, const vector<Rota>& rotas, int t
 
     saida << custoTotalGeral << "\n";      // Custo total de todas as rotas
     saida << rotas.size() << "\n";          // Número de rotas
-    saida << "0\n";                         // Tempo de referência (valor fixo 0)
-    saida << tempoSolucao << "\n";         // Tempo de execução do algoritmo
+    saida << tempoReferencia << "\n";       // Tempo de referência (ex: cálculo de caminhos mínimos)
+    saida << tempoSolucao << "\n";         // Tempo de execução do algoritmo (construtivo + melhoria)
 
     int idRota = 1;
     for (const auto& r : rotas) {
