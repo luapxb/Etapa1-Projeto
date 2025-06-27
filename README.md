@@ -25,16 +25,19 @@ Instruções de Compilação
 O projeto utiliza um Makefile para facilitar a compilação.
 
     Navegue até o diretório raiz do projeto:
-
+    ```bash
     cd ETAPA1-PROJETO
+    ```
 
     Para limpar quaisquer arquivos de compilação anteriores (objetos e executáveis):
-
+    ```bash
     make clean
+    ```
 
     Para compilar o código fonte e criar o executável solver:
-
+    ```
     make
+    ```
 
 Instruções de Execução
 
@@ -43,8 +46,9 @@ O executável solver processará automaticamente todos os arquivos de instância
     Certifique-se de que o executável solver foi compilado com sucesso (passo anterior).
 
     Execute o programa a partir do diretório raiz do projeto:
-
+    ```bash
     ./solver
+    ```
 
 Estrutura de diretórios esperada:
 
