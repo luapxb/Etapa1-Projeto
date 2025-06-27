@@ -1,70 +1,115 @@
-# Analisador de Grafos
+Analisador de Grafos e Solucionador de Problemas de Roteamento
+Descrição
 
-## Descrição
+Este projeto implementa um analisador de grafos para instâncias de problemas de roteamento e um solucionador heurístico. O programa calcula diversas métricas de grafos, incluindo conectividade, graus dos vértices, caminhos mínimos e outras propriedades relevantes (Fase 1). Além disso, ele constrói uma solução inicial utilizando uma heurística gulosa (Fase 2) e a aprimora através de um algoritmo de busca local 2-Opt (Fase 3).
+Fases do Projeto Implementadas
 
-Este projeto implementa um analisador de grafos para instâncias de problemas de roteamento. O programa calcula diversas métricas de grafos, incluindo conectividade, graus dos vértices, caminhos mínimos e outras propriedades relevantes.
+    Fase 1: Pré-processamento e Análise de Grafos
 
-## Instruções de Compilação
-1. Navegue até o diretório do projeto:
-```bash
-cd ETAPA1-PROJETO
-```
-2. Compile o código fonte:
-```bash
-g++ -o etapa1_cod etapa1cod.cpp 
-obs.: para a fase 2: 
-g++ -std=c++17 -o etapa2 etapa2.cpp
-```
+        Representação do problema usando estruturas de dados de grafos.
 
-## Instruções de Execução
-Forma básica:
-```bash
-./etapa1_cod instancias/nome_da_instancia.dat
-obs.: para a fase 2:
-./etapa2
-```
+        Implementação da leitura de dados de instâncias padrão.
 
-Exemplos:
-```bash
-./etapa1_cod instancias/grafo_simples.dat
-./etapa1_cod ../instancias/grafo_complexo.dat
-```
+        Cálculo de estatísticas e métricas do grafo (incluindo matriz de caminhos mínimos).
 
-Opções disponíveis:
-```bash
-./etapa1_cod -h       # Mostra ajuda
-./etapa1_cod --help   # Mostra ajuda
-```
+    Fase 2: Solução Inicial Construtiva
 
-## Saída do Programa
-O programa gera um relatório com 13 métricas do grafo:
+        Implementação de uma heurística gulosa (Vizinho Mais Próximo) para construir rotas que respeitem a capacidade dos veículos e garantam que cada serviço seja atendido exatamente uma vez.
 
-    1. Quantidade de vértices
+    Fase 3: Métodos de Melhoria
 
-    2. Quantidade de arestas
+        Implementação de um algoritmo de busca local (2-Opt) para otimizar as rotas geradas na Fase 2, visando reduzir o custo total da solução.
 
-    3. Quantidade de arcos
+Instruções de Compilação
 
-    4. Vértices requeridos
+O projeto utiliza um Makefile para facilitar a compilação.
 
-    5. Arestas requeridas
+    Navegue até o diretório raiz do projeto:
 
-    6. Arcos requeridos
+    cd ETAPA1-PROJETO
 
-    7. Densidade do grafo
+    Para limpar quaisquer arquivos de compilação anteriores (objetos e executáveis):
 
-    8. Componentes conectados
+    make clean
 
-    9. Grau mínimo
+    Para compilar o código fonte e criar o executável solver:
 
-    10. Grau máximo
+    make
 
-    11. Intermediação dos vértices
+Instruções de Execução
 
-    12. Caminho médio
+O executável solver processará automaticamente todos os arquivos de instância localizados na pasta ./instancias e salvará as soluções na pasta ./solucoes.
 
-    13. Diâmetro do grafo
+    Certifique-se de que o executável solver foi compilado com sucesso (passo anterior).
 
-## Colaboradores
-- Ketlyn Sara - @kethlynsara
-- Luana Peixoto - @luapxb
+    Execute o programa a partir do diretório raiz do projeto:
+
+    ./solver
+
+Estrutura de diretórios esperada:
+
+ETAPA1-PROJETO/
+├── src/
+│   ├── grafo.h
+│   ├── grafo.cpp
+│   ├── instancia.h
+│   ├── instancia.cpp
+│   ├── solucao.h
+│   ├── solucao.cpp
+│   ├── solver.h
+│   ├── solver.cpp
+│   ├── exportador.h
+│   └── exportador.cpp
+├── instancias/
+│   ├── instancia1.dat
+│   ├── instancia2.dat
+│   └── ...
+├── solucoes/ (será criado automaticamente)
+├── Makefile
+└── main.cpp
+
+Saída do Programa
+
+O programa gerará saídas detalhadas no console para cada instância processada, incluindo:
+
+    Informações de depuração sobre a leitura da instância (depósito, capacidade, número de nós e serviços).
+
+    Tempos de execução para o cálculo de caminhos mínimos (Fase 1), construção da solução inicial (Fase 2) e otimização com 2-Opt (Fase 3).
+
+    Custo total da solução inicial e final, e a redução de custo obtida.
+
+    Um arquivo de solução no formato sol-nome_da_instancia.dat será criado na pasta ./solucoes.
+
+As métricas calculadas e utilizadas internamente incluem:
+
+    Quantidade de vértices
+
+    Quantidade de arestas
+
+    Quantidade de arcos
+
+    Vértices requeridos
+
+    Arestas requeridas
+
+    Arcos requeridos
+
+    Densidade do grafo
+
+    Componentes conexas
+
+    Grau mínimo
+
+    Grau máximo
+
+    Intermediação dos vértices
+
+    Caminho médio
+
+    Diâmetro do grafo
+
+Colaboradores
+
+    Ketlyn Sara - @kethlynsara
+
+    Luana Peixoto - @luapxb
