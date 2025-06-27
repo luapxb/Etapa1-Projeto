@@ -1,19 +1,31 @@
 CXX = g++
-CXXFLAGS = -std=c++17 -Wall -O3
-SRC_DIR = src
-SRC = $(SRC_DIR)/grafo.cpp $(SRC_DIR)/instancia.cpp $(SRC_DIR)/solucao.cpp
-OBJ = $(SRC:.cpp=.o)
+CXXFLAGS = -std=c++17 -Wall -O3 -Isrc
+LDFLAGS =
+
+# Define os arquivos objeto
+OBJS = src/grafo.o src/instancia.o src/solucao.o src/solver.o
+
+# Nome do executável final
 TARGET = solver
 
 all: $(TARGET)
 
-$(TARGET): main.cpp $(OBJ)
-	$(CXX) $(CXXFLAGS) -I$(SRC_DIR) main.cpp $(OBJ) -o $@
+$(TARGET): main.cpp $(OBJS)
+	$(CXX) $(CXXFLAGS) $< $(OBJS) $(LDFLAGS) -o $@
 
-$(SRC_DIR)/%.o: $(SRC_DIR)/%.cpp
+# Regra para compilar cada arquivo .cpp para .o
+src/grafo.o: src/grafo.cpp src/grafo.h
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-clean:
-	rm -f $(TARGET) $(OBJ)
+src/instancia.o: src/instancia.cpp src/instancia.h src/grafo.h src/solucao.h
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-.PHONY: all clean
+src/solucao.o: src/solucao.cpp src/solucao.h src/grafo.h
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+src/solver.o: src/solver.cpp src/solver.h src/grafo.h src/solucao.h
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+.PHONY: clean
+clean:
+	rm -f $(TARGET) $(OBJS)

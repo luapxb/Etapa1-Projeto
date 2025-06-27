@@ -1,4 +1,6 @@
 #pragma once
 #include "solucao.h"
+#include "grafo.h" // Inclui grafo.h para a struct Grafo
 
-void exportarSolucao(const string& nomeArquivo, const vector<Rota>& rotas, int tempoSolucao);
+// Declaração da função para exportar a solução
+void exportarSolucao(const string& nomeArquivo, const vector<Rota>& rotas, int tempoSolucao, const Grafo& g);

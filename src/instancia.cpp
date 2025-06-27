@@ -3,13 +3,17 @@
 #include <sstream>
 #include <filesystem>
 #include <iostream>
-#include "grafo.h"
-#include "solucao.h"
+#include "solucao.h" // 'servicos' é global aqui
+#include <algorithm> // Necessário para std::max
 
 using namespace std;
 namespace fs = filesystem;
 
-void processarInstancia(const string& caminhoArquivo) {
+// 'servicos' é uma variável global, precisa ser 'extern' em solucao.h
+extern vector<Servico> servicos;
+
+// Processa o arquivo de instância para popular o grafo e os serviços
+void processarInstancia(const string& caminhoArquivo, Grafo& g) {
    cout << "Abrindo arquivo: " << caminhoArquivo << endl;
     ifstream arquivo(caminhoArquivo);
     if (!arquivo) {
@@ -17,36 +21,39 @@ void processarInstancia(const string& caminhoArquivo) {
         exit(1);
     }
 
-    limparDados(); 
+    limparDados(g); // Limpa os dados do grafo antes de processar uma nova instância
+    servicos.clear(); // Limpa o vetor global de serviços também
     string linha;
     string secao;
-    bool headerProcessed = false;
+    bool cabecalhoProcessado = false;
 
-    // Garante que o deposito esta no grafo
-    grafo[deposito] = vector<Aresta>(); // Inicializa o depósito no grafo
+    // Garante que o depósito está no grafo
+    g.adj[g.deposito] = vector<Aresta>(); // Inicializa o depósito na lista de adjacência
+    g.maxIdNo = max(g.maxIdNo, g.deposito); // Atualiza o ID máximo do nó com o depósito
 
     while (getline(arquivo, linha)) {
-        // Limpar espaços
+        // Limpar espaços em branco do início e fim da linha
         linha.erase(0, linha.find_first_not_of(" \t"));
         linha.erase(linha.find_last_not_of(" \t") + 1);
 
-        if (linha.empty()) continue;
+        if (linha.empty()) continue; // Ignora linhas vazias
 
-        // Processar cabeçalho
-        if (!headerProcessed) {
+        // Processa o cabeçalho do arquivo
+        if (!cabecalhoProcessado) {
             if (linha.find("Depot Node:") != string::npos) {
-                deposito = stoi(linha.substr(linha.find(":") + 1));
+                g.deposito = stoi(linha.substr(linha.find(":") + 1));
+                g.maxIdNo = max(g.maxIdNo, g.deposito); // Atualiza o ID máximo do nó
             }
             if (linha.find("Capacity:") != string::npos) {
-                capacidadeVeiculo = stoi(linha.substr(linha.find(":") + 1));
+                g.capacidadeVeiculo = stoi(linha.substr(linha.find(":") + 1));
             }
             if (linha.find("Name:") != string::npos) {
-                headerProcessed = true;
+                cabecalhoProcessado = true;
             }
             continue;
         }
 
-        // Identificar seções
+        // Identifica as seções do arquivo
         if (linha[0] == '#') {
             if (linha.find("#Nodes") != string::npos) secao = "Nodes";
             else if (linha.find("#Required N") != string::npos) secao = "Required N";
@@ -62,13 +69,13 @@ void processarInstancia(const string& caminhoArquivo) {
         else if (linha.find("EDGE") != string::npos) { secao = "EDGE"; continue; }
         else if (linha.find("ARC") != string::npos) { secao = "ARC"; continue; }
 
-        // Processar linhas
+        // Processa as linhas de dados com base na seção atual
         if (secao == "Required N") {
-            string nodeId;
+            string idNoStr;
             int demanda, custo;
             stringstream ss(linha);
-            ss >> nodeId >> demanda >> custo;
-            int id = stoi(nodeId.substr(1)); // Remove 'N'
+            ss >> idNoStr >> demanda >> custo;
+            int id = stoi(idNoStr.substr(1)); // Remove 'N' do ID do nó
 
             Servico serv;
             serv.id = (int)servicos.size() + 1;
@@ -78,17 +85,21 @@ void processarInstancia(const string& caminhoArquivo) {
             serv.custo = custo;
             serv.demanda = demanda;
             servicos.push_back(serv);
+
+            g.adj[id]; // Garante que o nó existe na lista de adjacência
+            g.maxIdNo = max(g.maxIdNo, id); // Atualiza o ID máximo do nó
         }
 
         else if (secao == "Edges") {
-            string edgeId;
+            string idArestaStr;
             int u, v, custo, demanda, custoServico;
             stringstream ss(linha);
-            ss >> edgeId >> u >> v >> custo >> demanda >> custoServico;
+            ss >> idArestaStr >> u >> v >> custo >> demanda >> custoServico;
 
-            // Adicionar ao grafo (bidirecional)
-            grafo[u].push_back({v, custo});
-            grafo[v].push_back({u, custo});
+            // Adiciona ao grafo (bidirecional)
+            g.adj[u].push_back({v, custo});
+            g.adj[v].push_back({u, custo});
+            g.maxIdNo = max(g.maxIdNo, max(u, v)); // Atualiza o ID máximo do nó
 
             // Serviço (aresta requerida)
             Servico serv;
@@ -102,13 +113,14 @@ void processarInstancia(const string& caminhoArquivo) {
         }
 
         else if (secao == "Arcs") {
-            string arcId;
+            string idArcoStr;
             int u, v, custo, demanda, custoServico;
             stringstream ss(linha);
-            ss >> arcId >> u >> v >> custo >> demanda >> custoServico;
+            ss >> idArcoStr >> u >> v >> custo >> demanda >> custoServico;
 
-            // Adicionar ao grafo (direcional)
-            grafo[u].push_back({v, custo});
+            // Adiciona ao grafo (direcional)
+            g.adj[u].push_back({v, custo});
+            g.maxIdNo = max(g.maxIdNo, max(u, v)); // Atualiza o ID máximo do nó
 
             // Serviço (arco requerido)
             Servico serv;
@@ -122,39 +134,35 @@ void processarInstancia(const string& caminhoArquivo) {
         }
 
         else if (secao == "EDGE") {
-            string edgeId;
+            string idArestaStr;
             int u, v, custo;
             stringstream ss(linha);
-            ss >> edgeId >> u >> v >> custo;
+            ss >> idArestaStr >> u >> v >> custo;
 
             // Apenas adiciona ao grafo (bidirecional)
-            grafo[u].push_back({v, custo});
-            grafo[v].push_back({u, custo});
+            g.adj[u].push_back({v, custo});
+            g.adj[v].push_back({u, custo});
+            g.maxIdNo = max(g.maxIdNo, max(u, v)); // Atualiza o ID máximo do nó
         }
 
         else if (secao == "ARC") {
-            string arcId;
+            string idArcoStr;
             int u, v, custo;
             stringstream ss(linha);
-            ss >> arcId >> u >> v >> custo;
+            ss >> idArcoStr >> u >> v >> custo;
 
             // Apenas adiciona ao grafo (direcional)
-            grafo[u].push_back({v, custo});
+            g.adj[u].push_back({v, custo});
+            g.maxIdNo = max(g.maxIdNo, max(u, v)); // Atualiza o ID máximo do nó
         }
     }
 
-    //cout << "Nós no grafo: " << grafo.size() << endl;
-    if (grafo.find(deposito) == grafo.end()) {
-        cerr << "AVISO: Depósito " << deposito << " não foi incluído no grafo!" << endl;
-        grafo[deposito] = vector<Aresta>(); // Força criação se ainda não existir
+    // Verifica se o nó do depósito foi realmente incluído
+    if (g.adj.find(g.deposito) == g.adj.end()) {
+        cerr << "AVISO: Depósito " << g.deposito << " não foi explicitamente incluído no grafo, forçando criação!" << endl;
+        g.adj[g.deposito] = vector<Aresta>(); // Força criação se ainda não existir
     }
-
-    // Garantir que todos os nós aparecem no grafo
-    for (const auto& [node, _] : grafo) {
-        if (grafo.find(node) == grafo.end()) {
-            grafo[node] = vector<Aresta>();
-        }
-    }
+    g.maxIdNo = max(g.maxIdNo, g.deposito); // Atualização final do ID máximo com o depósito
 
     arquivo.close();
 }

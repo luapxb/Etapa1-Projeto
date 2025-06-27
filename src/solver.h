@@ -2,4 +2,6 @@
 #include "grafo.h"
 #include "solucao.h"
 
-vector<Rota> construirRotas(const Grafo& grafo, const vector<Servico>& servicos);
+// Declaração da função para construir rotas
+// Recebe o objeto Grafo e o vetor de Servicos
+vector<Rota> construirRotas(const Grafo& g, const vector<Servico>& servicos);
