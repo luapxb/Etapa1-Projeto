@@ -21,7 +21,7 @@ O projeto utiliza um `Makefile` para facilitar a compilação.
 
 1.  Navegue até o diretório raiz do projeto:
     ```bash
-    cd ETAPA1-PROJETO
+    cd Etapa1-Projeto
     ```
 2.  Para limpar quaisquer arquivos de compilação anteriores (objetos e executáveis):
     ```bash
